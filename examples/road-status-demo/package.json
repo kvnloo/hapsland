@@ -7,7 +7,9 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "demo": "npm run build && node dist/main.js",
-    "test": "npm run build && node --test tests/*.test.mjs"
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "review:preview": "node scripts/review-matrix.mjs",
+    "review:live": "node scripts/review-matrix.mjs --live"
   },
   "devDependencies": {
     "typescript": "5.8.3"
