@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "cases": [
+    {"id":"road-invalid","ruleId":"meaningless_combinations","path":"src/flat-road-state.ts","declaration":"RoadState","line":1,"expectedFinding":true},
+    {"id":"road-corrected","ruleId":"meaningless_combinations","path":"src/tagged-road-state.ts","declaration":"RoadState","line":1,"expectedFinding":false},
+    {"id":"position-invalid","ruleId":"split_correlations","path":"src/loose-hazard-location.ts","declaration":"LooseHazardLocation","line":2,"expectedFinding":true},
+    {"id":"position-corrected","ruleId":"split_correlations","path":"src/hazard-location.ts","declaration":"HazardLocation","line":2,"expectedFinding":false},
+    {"id":"alerts-invalid","ruleId":"absence_confusion","path":"src/loose-route-alerts.ts","declaration":"LooseRouteAlerts","line":2,"expectedFinding":true},
+    {"id":"alerts-corrected","ruleId":"absence_confusion","path":"src/route-alerts.ts","declaration":"RouteAlerts","line":2,"expectedFinding":false},
+    {"id":"identity-invalid","ruleId":"bare_domain_value","path":"src/loose-evacuation-assignment.ts","declaration":"LooseEvacuationAssignment","line":2,"expectedFinding":true},
+    {"id":"identity-corrected","ruleId":"bare_domain_value","path":"src/evacuation-assignment.ts","declaration":"EvacuationAssignment","line":5,"expectedFinding":false}
+  ]
+}
