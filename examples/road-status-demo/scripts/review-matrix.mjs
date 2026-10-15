@@ -8,7 +8,10 @@ const supportedRules = new Set([
   "meaningless_combinations",
   "split_correlations",
   "absence_confusion",
-  "bare_domain_value"
+  "bare_domain_value",
+  "name_wider_than_type",
+  "name_claims_resource",
+  "body_reaches_undeclared"
 ])
 
 export function loadCases(root = demoRoot) {
@@ -30,7 +33,7 @@ export function loadCases(root = demoRoot) {
     if (typeof entry.expectedFinding !== "boolean") throw new Error(`Invalid expected finding for ${entry.id}`)
 
     const lines = readFileSync(join(root, entry.path), "utf8").split(/\r?\n/)
-    const declaration = lines[entry.line - 1]?.match(/^export (?:type|interface) ([A-Za-z][A-Za-z0-9]*)\b/)
+    const declaration = lines[entry.line - 1]?.match(/^export (?:type|interface|function) ([A-Za-z][A-Za-z0-9]*)\b/)
     if (declaration?.[1] !== entry.declaration)
       throw new Error(`${entry.id}: line does not target the declared type ${entry.declaration}`)
     const pair = pairs.get(entry.ruleId) ?? new Set()

@@ -6,7 +6,7 @@
 **Expected use:** Check type invariants offline; preview review selection; opt in separately to source-bearing classifier requests.
 **Lifecycle:** Update cases, examples, and commands when Hapsland's direct-review CLI, shipped rules, or source support changes. Keep planned work below aligned with observed test results.
 
-The purpose is to catch a common failure **before** an agent builds further logic around it. The four pairs deliberately contrast permissive shapes with stronger domain models:
+The purpose is to catch a common failure **before** an agent builds further logic around it. The seven pairs deliberately contrast permissive shapes with stronger domain models:
 
 | Built-in rule | Invalid example | Corrected example | Domain consequence |
 | --- | --- | --- | --- |
@@ -14,6 +14,9 @@ The purpose is to catch a common failure **before** an agent builds further logi
 | `split_correlations` | `loose-hazard-location.ts` | `hazard-location.ts` | A location may contain only one coordinate. |
 | `absence_confusion` | `loose-route-alerts.ts` | `route-alerts.ts` | Absent, null, and empty route alerts may mean the same thing. |
 | `bare_domain_value` | `loose-evacuation-assignment.ts` | `evacuation-assignment.ts` | Evacuee and vehicle IDs can be swapped. |
+| `name_wider_than_type` | `loose-road-risk.ts` | `road-risk.ts` | A risk band can contain arbitrary text. |
+| `name_claims_resource` | `loose-emergency-comms.ts` | `emergency-comms.ts` | An alert sender conceals its delivery channel. |
+| `body_reaches_undeclared` | `implicit-clock.ts` | `explicit-clock.ts` | A function uses an undeclared ambient clock. |
 
 ## Runtime trust boundary
 
@@ -32,7 +35,7 @@ npm --prefix examples/road-status-demo run demo
 npm --prefix examples/road-status-demo run review:preview
 ```
 
-TypeScript's `@ts-expect-error` checks cover invalid assignments, while `node:test` covers deterministic behavior and the review harness. The manifest validator verifies that each rule has one expected finding and one expected clear case, and that the selected line still targets its declared type. Offline tests use a stubbed CLI to verify output handling without sending source to a classifier.
+TypeScript's `@ts-expect-error` checks cover invalid assignments, while `node:test` covers deterministic behavior and the review harness. The manifest validator verifies that each of seven shipped rules has one expected finding and one expected clear case, and that the selected line still targets its declared type. Offline tests use a stubbed CLI to verify output handling without sending source to a classifier.
 
 ## Real classifier check: explicit opt-in
 
@@ -65,20 +68,21 @@ Each action requires concrete evidence; an expected classifier result is not a p
 6. [x] Distinguish evaluated findings, evaluated clears, skips, unavailable results, and disagreement.
 7. [x] Exercise the executable runner with a mock classifier and test output redaction.
 8. [x] Add path-scoped offline CI for the demo (verified successful on GitHub Actions).
-9. [x] Validate wire-shaped road observations and quarantine stale or contradictory states.
-10. [ ] Run the first two real `meaningless_combinations` checks on a supported machine with authorized credentials.
-11. [ ] Run the remaining six checks; record sanitized probabilities, thresholds, and failures.
-12. [ ] Triage classifier false positives and false negatives, then revise only cases supported by observed inputs.
-13. [ ] Repeat with a second backend under a separately approved request budget; compare accuracy and cost.
-14. [ ] Test an excluded dependency, expecting no forbidden read or classifier dispatch.
-15. [ ] Test stale source between selection and dispatch, expecting unavailable rather than false clear.
-16. [ ] Test TypeScript imported-domain closure and a missing-context skip.
-17. [ ] Test ambiguity when adjacent declarations overlap the selected line.
-18. [ ] Test overlapping agent edits, revision freshness, and cancellation handling.
-19. [ ] Measure review latency and model-request count with sanitized, repeatable receipts.
-20. [ ] Exercise feedback delivery on a supported Codex/Claude/Pi runtime; distinguish offered from model-visible advice.
-21. [ ] Compare repair-after-feedback with a control edit, including follow-up clear evidence.
-22. [ ] Run Hapsland root `check:fast` plus focused consumers when its pinned source toolchain is available.
-23. [ ] Use measured results to propose a small downstream GEV integration only if it improves a real review loop.
+9. [x] Cover all seven shipped Hapsland rules with matched A/B declarations.
+10. [x] Validate wire-shaped road observations and quarantine stale or contradictory states.
+11. [ ] Run the first two real `meaningless_combinations` checks on a supported machine with authorized credentials.
+12. [ ] Run the remaining twelve checks; record sanitized probabilities, thresholds, and failures.
+13. [ ] Triage classifier false positives and false negatives, then revise only cases supported by observed inputs.
+14. [ ] Repeat with a second backend under a separately approved request budget; compare accuracy and cost.
+15. [ ] Test an excluded dependency, expecting no forbidden read or classifier dispatch.
+16. [ ] Test stale source between selection and dispatch, expecting unavailable rather than false clear.
+17. [ ] Test TypeScript imported-domain closure and a missing-context skip.
+18. [ ] Test ambiguity when adjacent declarations overlap the selected line.
+19. [ ] Test overlapping agent edits, revision freshness, and cancellation handling.
+20. [ ] Measure review latency and model-request count with sanitized, repeatable receipts.
+21. [ ] Exercise feedback delivery on a supported Codex/Claude/Pi runtime; distinguish offered from model-visible advice.
+22. [ ] Compare repair-after-feedback with a control edit, including follow-up clear evidence.
+23. [ ] Run Hapsland root `check:fast` plus focused consumers when its pinned source toolchain is available.
+24. [ ] Use measured results to propose a small downstream GEV integration only if it improves a real review loop.
 
 **Credits:** [dearlordylord](https://github.com/dearlordylord/hapsland) created Hapsland and its shipped review rules. The GEV-inspired scenario here is a downstream teaching/evaluation fixture; no rule accuracy is claimed.

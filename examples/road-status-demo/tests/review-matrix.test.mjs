@@ -13,9 +13,9 @@ const evaluated = (probability, threshold = 0.7) => ({
   results: [{ ruleId: entry.ruleId, probability, threshold, finding: probability > threshold }]
 })
 
-test("manifest targets eight declared types with two expectations per rule", () => {
+test("manifest targets fourteen declarations with two expectations per rule", () => {
   const cases = loadCases()
-  assert.equal(cases.length, 8)
+  assert.equal(cases.length, 14)
   for (const rule of new Set(cases.map((c) => c.ruleId))) {
     assert.deepEqual(new Set(cases.filter((c) => c.ruleId === rule).map((c) => c.expectedFinding)), new Set([true, false]))
   }
