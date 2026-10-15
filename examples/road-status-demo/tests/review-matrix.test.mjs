@@ -6,9 +6,11 @@ import { tmpdir } from "node:os"
 import { join, delimiter } from "node:path"
 import { loadCases, summarizeResult, parseArguments } from "../scripts/review-matrix.mjs"
 
-const entry = { id: "bad", ruleId: "meaningless_combinations", expectedFinding: true }
+const entry = { id: "bad", ruleId: "meaningless_combinations", expectedFinding: true, path: "src/flat-road-state.ts", line: 1, declaration: "RoadState" }
 const evaluated = (probability, threshold = 0.7) => ({
   status: "evaluated",
+  version: 1, operation: "rule-check", path: entry.path, line: entry.line,
+  declaration: { name: entry.declaration, kind: "type" },
   classifierCalls: 1,
   results: [{ ruleId: entry.ruleId, probability, threshold, finding: probability > threshold }]
 })
@@ -23,7 +25,8 @@ test("manifest targets fourteen declarations with two expectations per rule", ()
 
 test("evaluated finding on exit zero is a match (not a CLI failure)", () => {
   assert.deepEqual(summarizeResult(entry, evaluated(0.91), 0), {
-    ...entry, status: "evaluated", matched: true, observedFinding: true, probability: 0.91, threshold: 0.7
+    id: entry.id, ruleId: entry.ruleId, expectedFinding: true,
+    status: "evaluated", matched: true, observedFinding: true, probability: 0.91, threshold: 0.7
   })
 })
 
@@ -40,6 +43,19 @@ test("unavailable, skipped and malformed responses are all failures", () => {
     { ...evaluated(0.9), results: [] },
     { ...evaluated(0.9), results: [{ ruleId: entry.ruleId, probability: 0.9, threshold: 0.7, finding: false }] }
   ]) assert.equal(summarizeResult(entry, payload, 0).matched, false)
+})
+
+test("review identity must match operation, path, line, and declaration", () => {
+  for (const changed of [
+    { operation: "other" }, { version: 2 }, { path: "another.ts" },
+    { line: 88 }, { declaration: { name: "OtherType" } }
+  ]) assert.equal(summarizeResult(entry, { ...evaluated(0.91), ...changed }, 0).matched, false)
+})
+
+test("duplicated or mismatched rule results cannot satisfy a case", () => {
+  const good = evaluated(0.91)
+  assert.equal(summarizeResult(entry, { ...good, results: [...good.results, ...good.results] }, 0).matched, false)
+  assert.equal(summarizeResult(entry, { ...good, results: [{ ...good.results[0], ruleId: "other" }] }, 0).matched, false)
 })
 
 test("nonzero CLI exits fail even if JSON claims an evaluated result", () => {
@@ -68,9 +84,11 @@ test("live runner checks real child-process output, saves only a sanitized summa
 const args = process.argv.slice(2)
 const source = args[args.indexOf("--path") + 1]
 const ruleId = args[args.indexOf("--id") + 1]
+const line = Number(args[args.indexOf("--line") + 1])
 const finding = source.includes("loose") || source.includes("flat-")
 process.stdout.write(JSON.stringify({
   status: "evaluated", classifierCalls: 1,
+  version: 1, operation: "rule-check", path: source, line, declaration: { name: "RoadState", kind: "type" },
   input: { source: "SENTINEL_DO_NOT_SAVE_OR_PRINT" },
   results: [{ ruleId, probability: finding ? 0.93 : 0.1, threshold: 0.7, finding }]
 }) + "\\n")

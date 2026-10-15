@@ -48,7 +48,7 @@ export function loadCases(root = demoRoot) {
 }
 
 /** Fail closed: exit 0 only means a request evaluated, not that a rule found no problem. */
-export function summarizeResult(entry, payload, exitCode) {
+export function summarizeResult(entry, payload, exitCode, expectedPath = entry.path) {
   const base = {
     id: entry.id,
     ruleId: entry.ruleId,
@@ -61,8 +61,12 @@ export function summarizeResult(entry, payload, exitCode) {
       : "invalid-response"
     return { ...base, status, matched: false }
   }
-  if (exitCode !== 0 || !Number.isInteger(payload.classifierCalls) || payload.classifierCalls < 1)
-    return { ...base, status: "invalid-response", matched: false }
+  if (
+    exitCode !== 0 || payload.version !== 1 || payload.operation !== "rule-check" ||
+    payload.path !== expectedPath || payload.line !== entry.line ||
+    payload.declaration?.name !== entry.declaration ||
+    !Number.isInteger(payload.classifierCalls) || payload.classifierCalls < 1
+  ) return { ...base, status: "invalid-response", matched: false }
   const results = Array.isArray(payload.results) ? payload.results : []
   const matchedRule = results.filter((result) => result.ruleId === entry.ruleId)
   if (
@@ -138,7 +142,7 @@ export function run(args = process.argv.slice(2)) {
     })
     let payload = null
     try { payload = JSON.parse(response.stdout) } catch { /* Unavailable/malformed is never clear. */ }
-    const item = summarizeResult(entry, payload, response.status)
+    const item = summarizeResult(entry, payload, response.status, path)
     summary.push(item)
     console.log(`${entry.id}: ${item.status}${item.status === "evaluated" ? `; finding=${item.observedFinding}` : ""}; ${item.matched ? "MATCH" : "NOT VERIFIED"}`)
   }
