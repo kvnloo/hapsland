@@ -15,6 +15,10 @@ The purpose is to catch a common failure **before** an agent builds further logi
 | `absence_confusion` | `loose-route-alerts.ts` | `route-alerts.ts` | Absent, null, and empty route alerts may mean the same thing. |
 | `bare_domain_value` | `loose-evacuation-assignment.ts` | `evacuation-assignment.ts` | Evacuee and vehicle IDs can be swapped. |
 
+## Runtime trust boundary
+
+Static TypeScript types cannot validate external JSON. The additional `src/road-intake.ts` example quarantines invalid, contradictory, stale, and future-timestamp observations before they become typed road candidates. It uses an illustrative five-minute freshness bound, not an accepted operational policy; 7 deterministic tests exercise the boundary.
+
 These examples are **not production God's Eye View code**. A corrected static type does not validate untrusted runtime JSON, prove a road safe, or verify that any classifier will identify the intended concern.
 
 ## Offline demo (no classifier required)
@@ -60,20 +64,21 @@ Each action requires concrete evidence; an expected classifier result is not a p
 5. [x] Add source-free preview and bounded opt-in live execution.
 6. [x] Distinguish evaluated findings, evaluated clears, skips, unavailable results, and disagreement.
 7. [x] Exercise the executable runner with a mock classifier and test output redaction.
-8. [x] Add path-scoped offline CI for the demo (workflow result must be checked separately).
-9. [ ] Run the first two real `meaningless_combinations` checks on a supported machine with authorized credentials.
-10. [ ] Run the remaining six checks; record sanitized probabilities, thresholds, and failures.
-11. [ ] Triage classifier false positives and false negatives, then revise only cases supported by observed inputs.
-12. [ ] Repeat with a second backend under a separately approved request budget; compare accuracy and cost.
-13. [ ] Test an excluded dependency, expecting no forbidden read or classifier dispatch.
-14. [ ] Test stale source between selection and dispatch, expecting unavailable rather than false clear.
-15. [ ] Test TypeScript imported-domain closure and a missing-context skip.
-16. [ ] Test ambiguity when adjacent declarations overlap the selected line.
-17. [ ] Test overlapping agent edits, revision freshness, and cancellation handling.
-18. [ ] Measure review latency and model-request count with sanitized, repeatable receipts.
-19. [ ] Exercise feedback delivery on a supported Codex/Claude/Pi runtime; distinguish offered from model-visible advice.
-20. [ ] Compare repair-after-feedback with a control edit, including follow-up clear evidence.
-21. [ ] Run Hapsland root `check:fast` plus focused consumers when its pinned source toolchain is available.
-22. [ ] Use measured results to propose a small downstream GEV integration only if it improves a real review loop.
+8. [x] Add path-scoped offline CI for the demo (verified successful on GitHub Actions).
+9. [x] Validate wire-shaped road observations and quarantine stale or contradictory states.
+10. [ ] Run the first two real `meaningless_combinations` checks on a supported machine with authorized credentials.
+11. [ ] Run the remaining six checks; record sanitized probabilities, thresholds, and failures.
+12. [ ] Triage classifier false positives and false negatives, then revise only cases supported by observed inputs.
+13. [ ] Repeat with a second backend under a separately approved request budget; compare accuracy and cost.
+14. [ ] Test an excluded dependency, expecting no forbidden read or classifier dispatch.
+15. [ ] Test stale source between selection and dispatch, expecting unavailable rather than false clear.
+16. [ ] Test TypeScript imported-domain closure and a missing-context skip.
+17. [ ] Test ambiguity when adjacent declarations overlap the selected line.
+18. [ ] Test overlapping agent edits, revision freshness, and cancellation handling.
+19. [ ] Measure review latency and model-request count with sanitized, repeatable receipts.
+20. [ ] Exercise feedback delivery on a supported Codex/Claude/Pi runtime; distinguish offered from model-visible advice.
+21. [ ] Compare repair-after-feedback with a control edit, including follow-up clear evidence.
+22. [ ] Run Hapsland root `check:fast` plus focused consumers when its pinned source toolchain is available.
+23. [ ] Use measured results to propose a small downstream GEV integration only if it improves a real review loop.
 
 **Credits:** [dearlordylord](https://github.com/dearlordylord/hapsland) created Hapsland and its shipped review rules. The GEV-inspired scenario here is a downstream teaching/evaluation fixture; no rule accuracy is claimed.
